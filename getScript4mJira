@@ -1,0 +1,23 @@
+#!/usr/bin/python3
+import json,requests,sys
+
+script=sys.argv[1]
+url='https://<jira-host>/rest/api/2/search'
+hders = {'Content-Type': 'application/json', 'cookie': 'JSESSIONID=05E4EA2A0654CA49C59EC9653F8FA3BD0'}
+data = {}
+data["jql"]='"Script Path" ~ \''+script+'\''
+data["maxResults"]=1
+data["fields"]=["summary","reporter"]
+
+r = requests.post(url, data=json.dumps(data) , headers=hders)
+if r.status_code == 200:
+    print (script,end=",")
+    resp = r.json()
+    if resp['total'] > 0 :
+        print(resp['issues'][0]['fields']['reporter']['displayName'])
+    else:
+        print("Unknown")
+else:
+    print(r.status_code)
+    print(r.headers)
+    print(r.content)
